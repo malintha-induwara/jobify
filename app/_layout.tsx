@@ -1,7 +1,35 @@
 import { SplashScreen, Stack } from "expo-router";
 import "./global.css";
 import { useFonts } from "expo-font";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Provider, useDispatch } from "react-redux";
+import { store } from "@/store";
+import { supabase } from "@/lib/supabase";
+import { setUser, logoutUser } from "@/store/authSlice";
+
+const AuthListener = () => {
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        dispatch(setUser(session.user));
+      } else {
+        dispatch(logoutUser());
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (loading) return null; 
+
+  return null;
+};
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -19,11 +47,12 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
-
   if (!fontsLoaded) return null;
-  return <Stack />;
+
+  return (
+    <Provider store={store}>
+      <AuthListener />
+      <Stack screenOptions={{ headerShown: false }} />
+    </Provider>
+  );
 }
