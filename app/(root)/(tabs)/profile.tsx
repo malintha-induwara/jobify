@@ -3,8 +3,8 @@ import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-na
 import { useDispatch, useSelector } from 'react-redux';
 import { User, Mail, Phone, Settings, Heart, CreditCard, HelpCircle, LogOut } from 'lucide-react-native';
 import { RootState } from '@/store';
-import { logout } from '@/lib/auth';
 import { logoutUser } from '@/store/authSlice';
+import { logout } from '@/lib/supabase';
 
 const Profile = () => {
   const dispatch = useDispatch();
