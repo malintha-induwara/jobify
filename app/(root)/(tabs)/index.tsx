@@ -1,45 +1,28 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Image, TextInput, FlatList, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
-import { Search, Briefcase, } from "lucide-react-native";
-import useFetch from "@/hook/fetchData";
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, TextInput, FlatList, ActivityIndicator } from "react-native";
+import { Search, Briefcase } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { saveJob, unsaveJob, checkJobSaved } from "@/store/savedJobsSlice";
 import { FilterChip } from "@/components/filter-chip";
 import { JobCard } from "@/components/job-card";
-
-type EmploymentType = "FULLTIME" | "CONTRACTOR" | "PARTTIME" | "INTERN";
-type ExperienceLevel = "under_3_years_experience" | "more_than_3_years_experience" | "no_experience" | "no_degree";
-
-interface Job {
-  job_id: string;
-  job_title: string;
-  employer_name: string;
-  employer_logo: string | null;
-  job_employment_type: EmploymentType;
-  job_posted_at_datetime_utc: string;
-  job_city?: string;
-  job_country?: string;
-}
+import { EmploymentType, JobRequirement, Job, fetchJobs, loadMoreJobs, resetJobs } from "@/store/jobsSlice";
 
 const EMPLOYMENT_TYPES: EmploymentType[] = ["FULLTIME", "CONTRACTOR", "PARTTIME", "INTERN"];
-const EXPERIENCE_LEVELS: ExperienceLevel[] = ["under_3_years_experience", "more_than_3_years_experience", "no_experience", "no_degree"];
+const EXPERIENCE_LEVELS: JobRequirement[] = ["under_3_years_experience", "more_than_3_years_experience", "no_experience", "no_degree"];
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [activeEmploymentTypes, setActiveEmploymentTypes] = useState<EmploymentType[]>([]);
-  const [activeExperienceLevels, setActiveExperienceLevels] = useState<ExperienceLevel[]>([]);
+  const [activeEmploymentType, setActiveEmploymentType] = useState<EmploymentType | null>(null);
+  const [activeExperienceLevel, setActiveExperienceLevel] = useState<JobRequirement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const [savedJobIds, setSavedJobIds] = useState<Record<string, boolean>>({});
 
-  const { items, isLoadingMore, hasMore } = useSelector((state: RootState) => state.jobs);
-  const { isLoading, error, refetch, loadMore } = useFetch("search", {
-    query: searchQuery || "all",
-    employment_types: activeEmploymentTypes.length > 0 ? activeEmploymentTypes : [],
-    job_requirements: activeExperienceLevels.length > 0 ? activeExperienceLevels : [],
-    date_posted: "all",
-  });
+  const { items, isLoading, isLoadingMore, hasMore, error } = useSelector((state: RootState) => state.jobs);
+
+  useEffect(() => {
+    handleSearch();
+  }, []);
 
   useEffect(() => {
     const checkSavedJobs = async () => {
@@ -60,35 +43,56 @@ const Home = () => {
     };
 
     checkSavedJobs();
-  }, [items]);
+  }, [items, dispatch]);
 
   const handleSearch = useCallback((): void => {
-    refetch();
-  }, [searchQuery, activeEmploymentTypes, activeExperienceLevels]);
+    const queryParams: any = {
+      query: searchQuery || "all",
+      date_posted: "all",
+    };
 
-  const toggleEmploymentType = (type: EmploymentType): void => {
-    setActiveEmploymentTypes((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
-  };
-
-  const handleEndReached = () => {
-    if (hasMore && !isLoadingMore) {
-      loadMore();
+    if (activeEmploymentType) {
+      queryParams.employment_types = activeEmploymentType;
     }
-  };
 
-  const renderFooter = () => {
-    if (!isLoadingMore) return null;
+    if (activeExperienceLevel) {
+      queryParams.job_requirements = activeExperienceLevel;
+    }
 
-    return (
-      <View className="py-4">
-        <ActivityIndicator size="large" color="#2563eb" />
-      </View>
-    );
-  };
+    dispatch(fetchJobs(queryParams));
+  }, [searchQuery, activeEmploymentType, activeExperienceLevel, dispatch]);
 
-  const toggleExperienceLevel = (level: ExperienceLevel): void => {
-    setActiveExperienceLevels((prev) => (prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]));
-  };
+  const handleLoadMore = useCallback(() => {
+    if (hasMore && !isLoadingMore) {
+      const queryParams: any = {
+        query: searchQuery || "all",
+        date_posted: "all",
+      };
+
+      if (activeEmploymentType) {
+        queryParams.employment_types = activeEmploymentType;
+      }
+
+      if (activeExperienceLevel) {
+        queryParams.job_requirements = activeExperienceLevel;
+      }
+
+      dispatch(loadMoreJobs(queryParams));
+    }
+  }, [hasMore, isLoadingMore, searchQuery, activeEmploymentType, activeExperienceLevel, dispatch]);
+
+  const handleRefresh = useCallback(() => {
+    dispatch(resetJobs());
+    handleSearch();
+  }, [dispatch, handleSearch]);
+
+  const toggleEmploymentType = useCallback((type: EmploymentType): void => {
+    setActiveEmploymentType((prevType) => (prevType === type ? null : type));
+  }, []);
+
+  const toggleExperienceLevel = useCallback((level: JobRequirement): void => {
+    setActiveExperienceLevel((prevLevel) => (prevLevel === level ? null : level));
+  }, []);
 
   const handleSaveJob = async (job: Job, isSaved: boolean): Promise<void> => {
     try {
@@ -102,6 +106,16 @@ const Home = () => {
     } catch (error) {
       console.error("Error saving/unsaving job:", error);
     }
+  };
+
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+
+    return (
+      <View className="py-4">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
   };
 
   const renderJobCard = ({ item }: { item: Job }) => <JobCard job={item} onSave={handleSaveJob} isSaved={savedJobIds[item.job_id] || false} />;
@@ -132,7 +146,7 @@ const Home = () => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row flex-wrap">
               {EMPLOYMENT_TYPES.map((type) => (
-                <FilterChip key={type} label={type} active={activeEmploymentTypes.includes(type)} onToggle={() => toggleEmploymentType(type)} />
+                <FilterChip key={type} label={type} active={activeEmploymentType === type} onToggle={() => toggleEmploymentType(type)} />
               ))}
             </View>
           </ScrollView>
@@ -143,7 +157,7 @@ const Home = () => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row flex-wrap">
               {EXPERIENCE_LEVELS.map((level) => (
-                <FilterChip key={level} label={level} active={activeExperienceLevels.includes(level)} onToggle={() => toggleExperienceLevel(level)} />
+                <FilterChip key={level} label={level} active={activeExperienceLevel === level} onToggle={() => toggleExperienceLevel(level)} />
               ))}
             </View>
           </ScrollView>
@@ -157,7 +171,7 @@ const Home = () => {
       ) : error ? (
         <View className="flex-1 items-center justify-center px-6">
           <Text className="text-red-500 text-center">Something went wrong. Please try again later.</Text>
-          <TouchableOpacity onPress={refetch} className="mt-4 bg-blue-600 px-6 py-3 rounded-lg">
+          <TouchableOpacity onPress={handleRefresh} className="mt-4 bg-blue-600 px-6 py-3 rounded-lg">
             <Text className="text-white font-medium">Retry</Text>
           </TouchableOpacity>
         </View>
@@ -173,9 +187,9 @@ const Home = () => {
             </View>
           }
           ListFooterComponent={renderFooter}
-          onEndReached={handleEndReached}
+          onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          onRefresh={refetch}
+          onRefresh={handleRefresh}
           refreshing={isLoading}
         />
       )}

@@ -2,69 +2,29 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, Image, ActivityIndicator, Alert, Linking } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, Briefcase, MapPin, Calendar, BookmarkPlus, ExternalLink } from "lucide-react-native";
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { saveJob, unsaveJob, checkJobSaved } from "@/store/savedJobsSlice";
-import { Job, EmploymentType } from "@/hook/fetchData";
-
-interface JobDetail {
-  job_id: string;
-  job_title: string;
-  employer_name: string;
-  employer_logo: string | null;
-  job_description: string;
-  job_employment_type: string;
-  job_posted_at_datetime_utc: string;
-  job_city?: string;
-  job_state?: string;
-  job_country?: string;
-  job_apply_link?: string;
-  job_highlights?: {
-    Qualifications?: string[];
-    Responsibilities?: string[];
-    Benefits?: string[];
-  };
-}
+import { fetchJobDetails, clearSelectedJob, EmploymentType } from "@/store/jobsSlice";
 
 const JobDetails = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const [jobDetails, setJobDetails] = useState<JobDetail | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState<boolean>(false);
 
+  const { data: jobDetails, isLoading, error } = useSelector((state: RootState) => state.jobs.selectedJob);
+
   useEffect(() => {
-    fetchJobDetails();
-    checkIfJobIsSaved();
-  }, [id]);
-
-  const fetchJobDetails = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.request({
-        method: "GET",
-        url: `https://jsearch.p.rapidapi.com/job-details`,
-        headers: {
-          "X-RapidAPI-Key": "e2761828bbmsh8b04a89d35c81f6p1a5075jsn1f75b2ecb4c4",
-          "X-RapidAPI-Host": "jsearch.p.rapidapi.com",
-        },
-        params: {
-          job_id: id,
-          country: "us",
-        },
-      });
-
-      setJobDetails(response.data.data[0]);
-    } catch (err) {
-      setError("Failed to load job details. Please try again.");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+    if (id) {
+      dispatch(fetchJobDetails(id as string));
+      checkIfJobIsSaved();
     }
-  };
+
+    return () => {
+      dispatch(clearSelectedJob());
+    };
+  }, [id, dispatch]);
 
   const checkIfJobIsSaved = async () => {
     if (id) {
@@ -120,6 +80,12 @@ const JobDetails = () => {
     });
   };
 
+  const handleRetry = () => {
+    if (id) {
+      dispatch(fetchJobDetails(id as string));
+    }
+  };
+
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-white">
@@ -141,7 +107,7 @@ const JobDetails = () => {
         </View>
         <View className="flex-1 items-center justify-center px-6">
           <Text className="text-red-500 text-center text-lg">{error || "Failed to load job details."}</Text>
-          <TouchableOpacity onPress={fetchJobDetails} className="mt-4 bg-blue-600 px-6 py-3 rounded-lg">
+          <TouchableOpacity onPress={handleRetry} className="mt-4 bg-blue-600 px-6 py-3 rounded-lg">
             <Text className="text-white font-medium">Retry</Text>
           </TouchableOpacity>
         </View>
