@@ -29,18 +29,18 @@ const Profile = () => {
               <User size={40} color="white" strokeWidth={1.5} />
             </View>
                <Text className="mt-4 text-xl font-bold text-gray-900">
-              {user.user_metadata.name}
+              {user.user_metadata.full_name || "No Name"}
             </Text>
           </View>
 
           <View className="mt-6 space-y-4">
             <View className="flex-row items-center space-x-3">
               <Mail size={20} color="#2563eb" />
-              <Text className="text-gray-700">{user.email}</Text>
+              <Text className="text-gray-700 ml-5 text-lg">{user.email}</Text>
             </View>
             <View className="flex-row items-center space-x-3">
               <Phone size={20} color="#2563eb" />
-              <Text className="text-gray-700">{user.phone || 'No phone added'}</Text>
+              <Text className="text-gray-700 ml-5 text-lg">{user.phone || 'No phone added'}</Text>
             </View>
           </View>
         </View>
