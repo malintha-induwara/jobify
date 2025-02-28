@@ -1,50 +1,101 @@
-# Welcome to your Expo app 👋
+# Jobify - Mobile Job Search Application
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern **Mobile Job Search Platform** that allows users to search for jobs, save favorites, and apply directly from their mobile device. Built with React Native and Expo.
 
-## Get started
+## Features
 
-1. Install dependencies
+### 1. **Job Search**
 
+- Search for jobs by title, company, or location
+- Filter results by job type, experience level, and more
+- View detailed job descriptions and requirements
+
+### 2. **User Authentication**
+
+- Create personal accounts
+- Secure login with Supabase authentication
+- Password recovery options
+
+### 3. **Job Management**
+
+- Save favorite jobs for later review
+- Track application history
+- Apply to jobs directly through the app
+
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm or yarn
+- Expo CLI
+- Supabase account
+- RapidAPI account (for JSearch API)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/jobify.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd jobify
+   ```
+3. Install dependencies:
    ```bash
    npm install
+   # or
+   yarn install
    ```
 
-2. Start the app
+### Configuration
 
+1. Create a `.env` file in the root directory:
    ```bash
-    npx expo start
+   cp .env.example .env
+   ```
+2. Add your API keys and configuration values:
+   ```
+   EXPO_PUBLIC_RAPIDAPI_KEY=your_rapid_api_key
+   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-In the output, you'll find options to open the app in a
+### Running the Application
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+1. Start the development server:
+   ```bash
+   npx expo start
+   ```
+2. Use the Expo Go app on your mobile device or an emulator to run the application
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Technology Stack
 
-## Get a fresh project
+[![React Native](https://img.shields.io/badge/React_Native-black?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 
-When you're ready, run:
+[![Expo](https://img.shields.io/badge/Expo-black?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
 
-```bash
-npm run reset-project
-```
+[![NativeWind](https://img.shields.io/badge/NativeWind-black?style=for-the-badge&logo=tailwindcss&logoColor=38B2AC)](https://www.nativewind.dev/)
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+[![Redux](https://img.shields.io/badge/Redux-black?style=for-the-badge&logo=redux&logoColor=764ABC)](https://redux.js.org/)
 
-## Learn more
+[![Supabase](https://img.shields.io/badge/Supabase-black?style=for-the-badge&logo=supabase&logoColor=3ECF8E)](https://supabase.io/)
 
-To learn more about developing your project with Expo, look at the following resources:
+[![Lucide React](https://img.shields.io/badge/Lucide_React-black?style=for-the-badge&logo=lucide&logoColor=FF5C5C)](https://lucide.dev/)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## API Integration
 
-## Join the community
+Jobify uses the [JSearch API](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) from RapidAPI to fetch real-time job listings from across the web. The API provides comprehensive job data including:
 
-Join our community of developers creating universal apps.
+- Job descriptions
+- Company information
+- Salary details
+- Location data
+- Application links
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
+
