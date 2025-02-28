@@ -51,7 +51,7 @@ export const JobCard = ({ job, onSave, isSaved }: JobCardProps) => {
         <View className="bg-blue-50 px-3 py-1 rounded-full">
           <Text className="text-blue-600 text-sm">{job.job_employment_type}</Text>
         </View>
-        <Text className="text-gray-500 text-sm">{job.job_posted_at_datetime_utc}</Text>
+        <Text className="text-gray-500 text-sm">{new Date(job.job_posted_at_datetime_utc).toLocaleDateString()}</Text>
       </View>
 
       {job.job_city && (
