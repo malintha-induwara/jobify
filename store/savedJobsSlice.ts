@@ -1,6 +1,18 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { supabase } from '@/lib/supabase';
-import { Job } from '@/hook/fetchData';
+import { EmploymentType } from './jobsSlice';
+
+export interface Job {
+  job_id: string;
+  job_title: string;
+  employer_name: string;
+  employer_logo: string | null;
+  job_employment_type: EmploymentType;
+  job_posted_at_datetime_utc: string;
+  job_city?: string;
+  job_country?: string;
+  job_requirements?: string[];
+}
 
 interface SavedJob extends Job {
   id?: string; 
