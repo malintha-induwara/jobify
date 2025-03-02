@@ -59,8 +59,8 @@ export default function SignIn() {
           <Text className="text-base text-center uppercase font-rubik text-black-200">Welcome To Jobify</Text>
 
           <Text className="text-3xl font-rubik-bold text-black-300 text-center mt-2">
-            Let's Get You
-            <Text className="text-blue-600"> A Job</Text>
+            Find Your Perfect
+            <Text className="text-blue-600">Dream Job</Text>
           </Text>
 
           <View className="mt-8">
