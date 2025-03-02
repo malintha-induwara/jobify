@@ -6,7 +6,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { saveJob, unsaveJob, checkJobSaved } from "@/store/savedJobsSlice";
 import { AppDispatch, RootState } from "@/store";
-import { EmploymentType } from "@/hook/fetchData";
+import { EmploymentType } from "@/store/jobsSlice";
 
 interface JobDetail {
   job_id: string;
@@ -154,13 +154,10 @@ const JobDetails = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header with back button */}
         <View className="p-6">
           <TouchableOpacity onPress={() => router.back()} className="mb-4">
             <ArrowLeft size={24} color="#0061FF" />
           </TouchableOpacity>
-
-          {/* Company and Job Title */}
           <View className="flex-row items-center mb-4">
             <Image
               source={{
@@ -174,15 +171,12 @@ const JobDetails = () => {
             </View>
           </View>
 
-          {/* Job Info Cards */}
           <View className="flex-row flex-wrap">
-            {/* Job Type */}
             <View className="bg-blue-50 p-3 rounded-xl mr-3 mb-3 flex-row items-center">
               <Briefcase size={18} color="#0061FF" />
               <Text className="ml-2 text-blue-600 font-medium">{jobDetails.job_employment_type}</Text>
             </View>
 
-            {/* Location */}
             {(jobDetails.job_city || jobDetails.job_country) && (
               <View className="bg-blue-50 p-3 rounded-xl mr-3 mb-3 flex-row items-center">
                 <MapPin size={18} color="#0061FF" />
@@ -190,7 +184,6 @@ const JobDetails = () => {
               </View>
             )}
 
-            {/* Posted Date */}
             <View className="bg-blue-50 p-3 rounded-xl mb-3 flex-row items-center">
               <Calendar size={18} color="#0061FF" />
               <Text className="ml-2 text-blue-600 font-medium">{formatDate(jobDetails.job_posted_at_datetime_utc)}</Text>
@@ -198,12 +191,10 @@ const JobDetails = () => {
           </View>
         </View>
 
-        {/* Job Description */}
         <View className="px-6 py-4">
           <Text className="text-lg font-bold text-gray-900 mb-3">Job Description</Text>
           <Text className="text-gray-700 mb-6 leading-6">{jobDetails.job_description}</Text>
 
-          {/* Qualifications */}
           {jobDetails.job_highlights?.Qualifications && (
             <View className="mb-6">
               <Text className="text-lg font-bold text-gray-900 mb-3">Qualifications</Text>
@@ -216,7 +207,6 @@ const JobDetails = () => {
             </View>
           )}
 
-          {/* Responsibilities */}
           {jobDetails.job_highlights?.Responsibilities && (
             <View className="mb-6">
               <Text className="text-lg font-bold text-gray-900 mb-3">Responsibilities</Text>
@@ -229,7 +219,6 @@ const JobDetails = () => {
             </View>
           )}
 
-          {/* Benefits */}
           {jobDetails.job_highlights?.Benefits && (
             <View className="mb-6">
               <Text className="text-lg font-bold text-gray-900 mb-3">Benefits</Text>
@@ -244,7 +233,6 @@ const JobDetails = () => {
         </View>
       </ScrollView>
 
-      {/* Action Buttons */}
       <View className="p-6 bg-white border-t border-gray-100">
         <View className="flex-row">
           <TouchableOpacity onPress={handleSaveJob} className={`flex-1 mr-3 py-4 rounded-xl flex-row justify-center items-center ${isSaved ? "bg-blue-100" : "bg-blue-50"}`} disabled={checkingSaved}>

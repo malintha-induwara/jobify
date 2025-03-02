@@ -1,4 +1,4 @@
-import { Job } from "@/hook/fetchData";
+import { Job } from "@/store/jobsSlice";
 import { useRouter } from "expo-router";
 import { BookmarkPlus, Check } from "lucide-react-native";
 import { Text } from "react-native";
